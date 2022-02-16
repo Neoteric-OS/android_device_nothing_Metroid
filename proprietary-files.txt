@@ -2282,7 +2282,6 @@ vendor/etc/sensors/config/sns_tilt_sw_enabled.json
 vendor/etc/sensors/config/sns_tilt_to_wake.json
 vendor/etc/sensors/config/sns_transport_ppe.json
 vendor/etc/sensors/config/sns_wrist_pedo.json
-vendor/etc/sensors/hals.conf
 vendor/etc/sensors/javalibs/odpmanagerlib-aar
 vendor/etc/sensors/sns_odp_config
 vendor/etc/sensors/sns_reg_config
