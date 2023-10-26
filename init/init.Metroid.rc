@@ -19,6 +19,8 @@ on boot
     chmod 0666 /dev/stune/background/cgroup.procs
     chmod 0666 /dev/stune/top-app/cgroup.procs
 
+    chown system system /sys/devices/platform/soc/ac0000.qcom,qupv3_1_geni_se/a90000.spi/spi_master/spi4/spi4.0/fts_gesture_fod_pressed
+
 # Migrate tasks again in case kernel threads are created during boot
 on property:sys.boot_completed=1
     copy_per_line /dev/cpuctl/tasks /dev/cpuctl/system/tasks
