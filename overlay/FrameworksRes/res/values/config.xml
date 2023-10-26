@@ -534,4 +534,10 @@
     <!-- Fingerprint from stock ROM -->
     <string name="config_stockFingerprint" translatable="false">Nothing/Metroid/Metroid:15/AQ3A.250728.001/2604141846:user/release-keys</string>
 
+    <!-- Whether devices suports in-display fingerprint when screen is off -->
+    <bool name="config_screen_off_udfps_enabled">true</bool>
+
+    <!-- Type of the udfps long press sensor. Empty if long press is not supported. -->
+    <string name="config_dozeUdfpsLongPressSensorType" translatable="false">org.neoteric.sensor.udfps</string>
+
 </resources>
