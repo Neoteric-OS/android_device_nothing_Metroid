@@ -3,3 +3,6 @@ type vendor_proc_fingerprint, fs_type, proc_type;
 
 # Sensors
 type vendor_sysfs_panel_state, fs_type, sysfs_type;
+
+# Camera
+type sysfs_torch, sysfs_type, fs_type;

@@ -8,7 +8,6 @@ DEVICE_PATH := device/nothing/Metroid
 
 # A/B
 AB_OTA_UPDATER := true
-
 AB_OTA_PARTITIONS += \
     boot \
     init_boot \
@@ -44,6 +43,9 @@ SOONG_CONFIG_ufsbsg_ufsframework := bsg
 
 # Build
 BUILD_BROKEN_DUP_RULES := true
+
+# Camera
+TARGET_CAMERA_SERVICE_EXT_LIB := //$(DEVICE_PATH):libcameraservice_extension.Metroid
 
 # Display
 TARGET_SCREEN_DENSITY := 480

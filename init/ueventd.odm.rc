@@ -64,3 +64,8 @@ external_firmware_handler /devices/platform/soc/soc:gh-secure-vm-loader@1/firmwa
 external_firmware_handler /devices/platform/soc/soc:gh-secure-vm-loader@1/firmware/oemvm.b03 system "/vendor/bin/vmmgr -r"
 external_firmware_handler /devices/platform/soc/soc:gh-secure-vm-loader@1/firmware/oemvm.b04 system "/vendor/bin/vmmgr -r"
 external_firmware_handler /devices/platform/soc/soc:gh-secure-vm-loader@1/firmware/oemvm.b05 system "/vendor/bin/vmmgr -r"
+
+# Camera
+/sys/devices/platform/soc/c42d000.qcom,spmi/spmi-0/0-01/c42d000.qcom,spmi:qcom,pmxr2230@1:qcom,flash_led@ee00/leds/led:torch_0  brightness 0660 cameraserver camera
+/sys/devices/platform/soc/c42d000.qcom,spmi/spmi-0/0-01/c42d000.qcom,spmi:qcom,pmxr2230@1:qcom,flash_led@ee00/leds/led:torch_3  brightness 0660 cameraserver camera
+/sys/devices/platform/soc/c42d000.qcom,spmi/spmi-0/0-01/c42d000.qcom,spmi:qcom,pmxr2230@1:qcom,flash_led@ee00/leds/led:switch_0 brightness 0660 cameraserver camera
