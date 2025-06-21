@@ -1,2 +1,5 @@
 # Audio
 ro.audio.ihaladaptervendorextension_enabled=true
+
+# Display
+sys.brightness.disable_gamma_conversion=true
