@@ -29,8 +29,10 @@ void onClientDeath(void* cookie) {
 }
 
 Session::Session(fingerprint_device_t* device, int32_t userId,
-            std::shared_ptr<ISessionCallback> cb, LockoutTracker lockoutTracker)
-            : mDevice(device), mUserId(userId), mLockoutTracker(lockoutTracker), mCb(cb) {
+            std::shared_ptr<ISessionCallback> cb, LockoutTracker lockoutTracker,
+            int maxEnrollmentsPerUser)
+            : mDevice(device), mUserId(userId), mLockoutTracker(lockoutTracker),
+              mMaxEnrollmentsPerUser(maxEnrollmentsPerUser), mCb(cb) {
     mDeathRecipient = AIBinder_DeathRecipient_new(onClientDeath);
 
     std::string path = ::android::base::StringPrintf("/data/vendor_de/%d/fpdata/", mUserId);
@@ -38,17 +40,16 @@ Session::Session(fingerprint_device_t* device, int32_t userId,
 }
 
 ndk::ScopedAStatus Session::generateChallenge() {
-    uint64_t challenge = mDevice->pre_enroll(mDevice);
-    ALOGI("generateChallenge: %ld", challenge);
-    mCb->onChallengeGenerated(challenge);
+    ALOGI("generateChallenge");
+    mDevice->generateChallenge(mDevice);
 
     return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus Session::revokeChallenge(int64_t challenge) {
     ALOGI("revokeChallenge: %ld", challenge);
-    mDevice->post_enroll(mDevice);
-    mCb->onChallengeRevoked(challenge);
+
+    mDevice->revokeChallenge(mDevice, challenge);
 
     return ndk::ScopedAStatus::ok();
 }
@@ -60,7 +61,7 @@ ndk::ScopedAStatus Session::enroll(const HardwareAuthToken& hat,
     hw_auth_token_t authToken;
     translate(hat, authToken);
 
-    int error = mDevice->enroll(mDevice, &authToken, mUserId, 60);
+    int error = mDevice->enroll(mDevice, &authToken);
     if (error) {
         ALOGE("enroll failed: %d", error);
         mCb->onError(Error::UNABLE_TO_PROCESS, error);
@@ -74,7 +75,7 @@ ndk::ScopedAStatus Session::authenticate(int64_t operationId,
                                          std::shared_ptr<ICancellationSignal>* out) {
     ALOGI("authenticate");
 
-    int error = mDevice->authenticate(mDevice, operationId, mUserId);
+    int error = mDevice->authenticate(mDevice, operationId);
     if (error) {
         ALOGE("authenticate failed: %d", error);
         mCb->onError(Error::UNABLE_TO_PROCESS, error);
@@ -107,33 +108,38 @@ ndk::ScopedAStatus Session::enumerateEnrollments() {
 ndk::ScopedAStatus Session::removeEnrollments(const std::vector<int32_t>& enrollmentIds) {
     ALOGI("removeEnrollments, size: %zu", enrollmentIds.size());
 
-    for (int32_t fid : enrollmentIds) {
-        int error = mDevice->remove(mDevice, mUserId, fid);
-        if (error) {
-            ALOGE("remove failed: %d", error);
-        }
+    std::vector<uint32_t> fids(enrollmentIds.begin(), enrollmentIds.end());
+    int error = mDevice->remove(mDevice, fids.data(), static_cast<uint32_t>(fids.size()));
+    if (error) {
+        ALOGE("Failed to remove enrollments: %d", error);
     }
     return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus Session::getAuthenticatorId() {
-    uint64_t auth_id = mDevice->get_authenticator_id(mDevice);
-    ALOGI("getAuthenticatorId: %ld", auth_id);
-    mCb->onAuthenticatorIdRetrieved(auth_id);
+    ALOGI("getAuthenticatorId");
+    mDevice->getAuthenticatorId(mDevice);
     
     return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus Session::invalidateAuthenticatorId() {
-    uint64_t auth_id = mDevice->get_authenticator_id(mDevice);
-    ALOGI("invalidateAuthenticatorId: %ld", auth_id);
-    mCb->onAuthenticatorIdInvalidated(auth_id);
+    ALOGI("invalidateAuthenticatorId");
+    mDevice->invalidateAuthenticatorId(mDevice);
 
     return ndk::ScopedAStatus::ok();
 }
 
-ndk::ScopedAStatus Session::resetLockout(const HardwareAuthToken& /*hat*/) {
+ndk::ScopedAStatus Session::resetLockout(const HardwareAuthToken& hat) {
     ALOGI("resetLockout");
+
+    hw_auth_token_t authToken;
+    translate(hat, authToken);
+
+    int error = mDevice->resetLockout(mDevice, &authToken);
+    if (error != 0) {
+        ALOGE("Failed to reset lockout: %d", error);
+    }
 
     clearLockout(true);
     mIsLockoutTimerAborted = true;
@@ -144,8 +150,6 @@ ndk::ScopedAStatus Session::resetLockout(const HardwareAuthToken& /*hat*/) {
 ndk::ScopedAStatus Session::onPointerDown(int32_t /*pointerId*/, int32_t x, int32_t y, float minor,
                                           float major) {
     ALOGI("onPointerDown: x=%d, y=%d, minor=%f, major=%f", x, y, minor, major);
-
-    checkSensorLockout();
 
     return ndk::ScopedAStatus::ok();
 }
@@ -198,7 +202,11 @@ ndk::ScopedAStatus Session::onPointerCancelWithContext(const PointerContext& /*c
     return ndk::ScopedAStatus::ok();
 }
 
-ndk::ScopedAStatus Session::setIgnoreDisplayTouches(bool /*shouldIgnore*/) {
+ndk::ScopedAStatus Session::setIgnoreDisplayTouches(bool shouldIgnore) {
+    ALOGI("setIgnoreDisplayTouches: %d", shouldIgnore);
+    if (mDevice && mDevice->setIgnoreDisplayTouches) {
+        mDevice->setIgnoreDisplayTouches(mDevice, shouldIgnore);
+    }
     return ndk::ScopedAStatus::ok();
 }
 
@@ -208,12 +216,10 @@ ndk::ScopedAStatus Session::cancel() {
     int ret = mDevice->cancel(mDevice);
 
     if (ret == 0) {
-        mCb->onError(Error::CANCELED, 0 /* vendorCode */);
-
-        return ndk::ScopedAStatus::ok();
-    } else {
-        return ndk::ScopedAStatus::fromServiceSpecificError(ret);
+        return ndk::ScopedAStatus::fromServiceSpecificError(ret); 
     }
+
+    return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus Session::close() {
@@ -338,10 +344,20 @@ void Session::lockoutTimerExpired() {
 void Session::notify(const fingerprint_msg_t* msg) {
     switch (msg->type) {
         case FINGERPRINT_ERROR: {
-            int32_t vendorCode = 0;
-            Error result = VendorErrorFilter(msg->data.error, &vendorCode);
-            ALOGD("onError(%hhd, %d)", result, vendorCode);
-            mCb->onError(result, vendorCode);
+            if (msg->data.error == FINGERPRINT_ERROR_LOCKOUT) {
+                const uint64_t duration = *reinterpret_cast<const uint64_t*>(
+                        reinterpret_cast<const char*>(msg) + 16);
+                ALOGI("FINGERPRINT_ERROR_LOCKOUT duration=%lu ms", duration);
+                mCb->onLockoutTimed(duration);
+            } else if (msg->data.error == FINGERPRINT_ERROR_LOCKOUT_PERMANENT) {
+                ALOGI("FINGERPRINT_ERROR_LOCKOUT_PERMANENT");
+                mCb->onLockoutPermanent();
+            } else {
+                int32_t vendorCode = 0;
+                Error result = VendorErrorFilter(msg->data.error, &vendorCode);
+                ALOGD("onError(%hhd, %d)", result, vendorCode);
+                mCb->onError(result, vendorCode);
+            }
         } break;
         case FINGERPRINT_ACQUIRED: {
             int32_t vendorCode = 0;
@@ -362,10 +378,15 @@ void Session::notify(const fingerprint_msg_t* msg) {
                                       msg->data.enroll.samples_remaining);
         } break;
         case FINGERPRINT_TEMPLATE_REMOVED: {
-            ALOGD("onRemove(fid=%d, gid=%d, rem=%d)", msg->data.removed.finger.fid,
-                  msg->data.removed.finger.gid, msg->data.removed.remaining_templates);
-            std::vector<int> enrollments;
-            enrollments.push_back(msg->data.removed.finger.fid);
+            std::vector<int32_t> enrollments;
+            const fingerprint_finger_id_t* fingers =
+                    reinterpret_cast<const fingerprint_finger_id_t*>(&msg->data);
+            for (int i = 0; i < mMaxEnrollmentsPerUser; i++) {
+                if (fingers[i].fid != 0) {
+                    ALOGD("onRemove(fid=%d, gid=%d)", fingers[i].fid, fingers[i].gid);
+                    enrollments.push_back(fingers[i].fid);
+                }
+            }
             mCb->onEnrollmentsRemoved(enrollments);
         } break;
         case FINGERPRINT_AUTHENTICATED: {
@@ -380,19 +401,35 @@ void Session::notify(const fingerprint_msg_t* msg) {
                 mLockoutTracker.reset(true);
             } else {
                 mCb->onAuthenticationFailed();
-                mLockoutTracker.addFailedAttempt();
-                checkSensorLockout();
             }
         } break;
         case FINGERPRINT_TEMPLATE_ENUMERATING: {
-            ALOGD("onEnumerate(fid=%d, gid=%d, rem=%d)", msg->data.enumerated.finger.fid,
-                  msg->data.enumerated.finger.gid, msg->data.enumerated.remaining_templates);
-            static std::vector<int> enrollments;
-            enrollments.push_back(msg->data.enumerated.finger.fid);
-            if (msg->data.enumerated.remaining_templates == 0) {
-                mCb->onEnrollmentsEnumerated(enrollments);
-                enrollments.clear();
+            std::vector<int32_t> enrollments;
+            const fingerprint_finger_id_t* fingers =
+                    reinterpret_cast<const fingerprint_finger_id_t*>(&msg->data);
+            for (int i = 0; i < mMaxEnrollmentsPerUser; i++) {
+                if (fingers[i].fid != 0) {
+                    ALOGD("onEnumerate(fid=%d, gid=%d)", fingers[i].fid, fingers[i].gid);
+                    enrollments.push_back(fingers[i].fid);
+                }
             }
+            mCb->onEnrollmentsEnumerated(enrollments);
+        } break;
+        case FINGERPRINT_CHALLENGE_GENERATED: {
+            ALOGD("onChallengeGenerated(%lu)", msg->data.data);
+            mCb->onChallengeGenerated(msg->data.data);
+        } break;
+        case FINGERPRINT_CHALLENGE_REVOKED: {
+            ALOGD("onChallengeRevoked(%lu)", msg->data.data);
+            mCb->onChallengeRevoked(msg->data.data);
+        } break;
+        case FINGERPRINT_AUTHENTICATOR_ID_RETRIEVED: {
+            ALOGD("onAuthenticatorIdRetrieved(%lu)", msg->data.data);
+            mCb->onAuthenticatorIdRetrieved(msg->data.data);
+        } break;
+        case FINGERPRINT_AUTHENTICATOR_ID_INVALIDATED: {
+            ALOGD("onAuthenticatorIdInvalidated(%lu)", msg->data.data);
+            mCb->onAuthenticatorIdInvalidated(msg->data.data);
         } break;
     }
 }

@@ -31,7 +31,8 @@ void onClientDeath(void* cookie);
 class Session : public BnSession {
 public:
     Session(fingerprint_device_t* device, int32_t userId,
-            std::shared_ptr<ISessionCallback> cb, LockoutTracker lockoutTracker);
+            std::shared_ptr<ISessionCallback> cb, LockoutTracker lockoutTracker,
+            int maxEnrollmentsPerUser);
     ndk::ScopedAStatus generateChallenge() override;
     ndk::ScopedAStatus revokeChallenge(int64_t challenge) override;
     ndk::ScopedAStatus enroll(const HardwareAuthToken& hat,
@@ -98,6 +99,8 @@ private:
 
     // Binder death handler.
     AIBinder_DeathRecipient* mDeathRecipient;
+
+    int mMaxEnrollmentsPerUser;
 };
 
 } // namespace fingerprint
