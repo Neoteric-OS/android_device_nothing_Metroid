@@ -186,6 +186,10 @@ vendor.mm.enable.qcom_parser=16777215
 # Nothing
 ro.vendor.nothing.feature.base=0x600800001004458438124a040106b4247b97ffL
 ro.vendor.nothing.feature.diff.device.Metroid=0x2240201afa7621a5c028d100ad44003d1842080L
+ro.vendor.nothing.feature.diff.product.MetroidIND=0x10000000000000000000000L
+ro.vendor.nothing.feature.diff.product.MetroidEEA=0x8000000000000000000000L
+ro.vendor.nothing.feature.diff.product.MetroidJPN=0x20000000000000000000000L
+ro.vendor.nothing.feature.diff.product.MetroidTUR=0x20000000000000000000000000L
 
 # QCOM
 persist.vendor.qcomsysd.enabled=1

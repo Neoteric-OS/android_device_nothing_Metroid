@@ -9,3 +9,5 @@ ro.product.marketname=Nothing Phone (3)
 
 # USB
 vendor.usb.product_string=Nothing Phone (3)
+
+import /odm/etc/build_${ro.boot.hardware.sku}.prop
