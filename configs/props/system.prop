@@ -1,0 +1,13 @@
+# Camera
+vendor.camera.aux.packagelist=org.lineageos.aperture,org.codeaurora.snapcam,com.nothing.camera
+
+# Charger
+ro.charger.enable_suspend=1
+
+# CNE
+persist.vendor.cne.feature=1
+
+# Media
+media.aac_51_output_enabled=true
+media.settings.xml=/vendor/etc/media_profiles_vendor.xml
+ro.media.recorder-max-base-layer-fps=60
