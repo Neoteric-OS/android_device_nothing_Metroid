@@ -1,0 +1,11 @@
+# Bluetooth
+bluetooth.device.default_name=Nothing Phone (3)
+
+# Display
+vendor.display.disable_hw_recovery_dump=1
+
+# Marketname
+ro.product.marketname=Nothing Phone (3)
+
+# USB
+vendor.usb.product_string=Nothing Phone (3)
