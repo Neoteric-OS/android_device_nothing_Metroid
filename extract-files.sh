@@ -127,6 +127,10 @@ function blob_fixup() {
             [ "$2" = "" ] && return 0
             sed -i 's/get_module_version="true"/get_module_version="false"/g' "${2}"
             ;;
+        vendor/etc/camera/camxoverridesettings.txt)
+            [ "$2" = "" ] && return 0
+            sed -i 's/maxNonHfrFps=30/maxNonHfrFps=60/g' "${2}"
+            ;;
     esac
 }
 
