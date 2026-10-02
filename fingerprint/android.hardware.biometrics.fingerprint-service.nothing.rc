@@ -1,3 +1,13 @@
+on boot
+    chmod 666 /sys/panel_feature/fp_status
+    chown system system /sys/panel_feature/fp_status
+
+    chmod 660 /dev/goodix_fp
+    chown system system /dev/goodix_fp
+
+    chmod 0660 /proc/touchpanel/fod_mode
+    chown system system /proc/touchpanel/fod_mode
+
 service vendor.fingerprint-nothing /vendor/bin/hw/android.hardware.biometrics.fingerprint-service.nothing
     class late_start
     user system
