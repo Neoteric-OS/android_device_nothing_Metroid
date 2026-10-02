@@ -25,8 +25,6 @@ PRODUCT_MANUFACTURER := Nothing
 IS_OFFICIAL := true
 
 PRODUCT_BUILD_PROP_OVERRIDES += \
-    BuildDesc="Metroid-user 15 AQ3A.250728.001 2604141846 release-keys" \
-    BuildFingerprint=Nothing/Metroid/Metroid:15/AQ3A.250728.001/2604141846:user/release-keys\
     DeviceName=Metroid \
     DeviceProduct=Metroid \
     SystemDevice=Metroid \
