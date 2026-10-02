@@ -531,4 +531,7 @@
     <!-- Specifies the maximum burn-in offset vertically. -->
     <integer name="config_burnInProtectionMaxVerticalOffset">40</integer>
 
+    <!-- Fingerprint from stock ROM -->
+    <string name="config_stockFingerprint" translatable="false">Nothing/Metroid/Metroid:15/AQ3A.250728.001/2604141846:user/release-keys</string>
+
 </resources>
