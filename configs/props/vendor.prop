@@ -112,6 +112,11 @@ vendor.wv.oemcrypto.debug.enable_external_display_check=false
 vendor.wv.oemcrypto.debug.enable_hlos_data_path=true
 vendor.wv.oemcrypto.debug.enable_prov40=true
 
+# Fingerprint
+ro.vendor.fingerprint.max_enrollments=5
+ro.vendor.fingerprint.type=udfps_optical
+ro.vendor.fingerprint.sensor_location=630|2547|109
+
 # FRP
 ro.frp.pst=/dev/block/bootdevice/by-name/frp
 
