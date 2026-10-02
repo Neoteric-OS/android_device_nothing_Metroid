@@ -443,7 +443,7 @@ PRODUCT_PACKAGES += \
 
 # Sensors
 PRODUCT_PACKAGES += \
-    android.hardware.sensors-service.multihal
+    android.hardware.sensors-service.nothing-multihal
 
 PRODUCT_PACKAGES += \
     android.hardware.sensors-V2-ndk.vendor
