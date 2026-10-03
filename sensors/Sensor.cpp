@@ -24,23 +24,33 @@
 
 namespace {
 
-static bool readBool(int fd) {
-    char c;
+static bool readTapState(int fd, int& screenX, int& screenY) {
+    char buffer[512];
     int rc;
 
     rc = lseek(fd, 0, SEEK_SET);
     if (rc) {
-        ALOGE("failed to seek fd, err: %d", rc);
+        ALOGE("failed to seek: %d", rc);
         return false;
     }
 
-    rc = read(fd, &c, sizeof(char));
-    if (rc != 1) {
-        ALOGE("failed to read bool from fd, err: %d", rc);
+    rc = read(fd, buffer, sizeof(buffer) - 1);
+    if (rc < 0) {
+        ALOGE("failed to read state: %d", rc);
+        return false;
+    }
+    buffer[rc] = '\0';
+
+    rc = sscanf(buffer, "%d,%d", &screenX, &screenY);
+    if (rc < 2) {
+        ALOGE("failed to parse tap state: %d", rc);
         return false;
     }
 
-    return c != '0';
+    if (screenX == 0 && screenY == 0)
+        return false;
+
+    return true;
 }
 
 static bool readFpState(int fd, int& screenX, int& screenY) {
@@ -353,7 +363,9 @@ void UdfpsSensor::interruptPoll() {
 }
 
 SingleTapSensor::SingleTapSensor(int32_t sensorHandle, ISensorsEventCallback* callback)
-    : OneShotSensor(sensorHandle, callback) {
+    : OneShotSensor(sensorHandle, callback),
+      mScreenX(0),
+      mScreenY(0) {
     mSensorInfo.name = "Single Tap Sensor";
     mSensorInfo.type =
             static_cast<SensorType>(static_cast<int32_t>(SensorType::DEVICE_PRIVATE_BASE) + 2);
@@ -433,7 +445,7 @@ void SingleTapSensor::run() {
                 continue;
             }
 
-            if (mPolls[1].revents == mPolls[1].events && readBool(mPollFd)) {
+            if (mPolls[1].revents == mPolls[1].events && readTapState(mPollFd, mScreenX, mScreenY)) {
                 mIsEnabled = false;
                 mCallback->postEvents(readEvents(), isWakeUpSensor());
             } else if (mPolls[0].revents == mPolls[0].events) {
@@ -450,6 +462,8 @@ std::vector<Event> SingleTapSensor::readEvents() {
     event.sensorHandle = mSensorInfo.sensorHandle;
     event.sensorType = mSensorInfo.type;
     event.timestamp = ::android::elapsedRealtimeNano();
+    event.u.data[0] = mScreenX;
+    event.u.data[1] = mScreenY;
     events.push_back(event);
     return events;
 }
