@@ -1,0 +1,13 @@
+on post-fs-data
+    chown system system /sys/class/leds/vibrator_nt/activate
+    chown system system /sys/class/leds/vibrator_nt/brightness
+    chown system system /sys/class/leds/vibrator_nt/loop
+    chown system system /sys/class/leds/vibrator_nt/duration
+    chown system system /sys/class/leds/vibrator_nt/index
+    chown system system /sys/class/leds/vibrator_nt/gain
+    chown system system /sys/class/leds/vibrator_nt/vmax
+
+service vendor.vibrator-nothing /vendor/bin/hw/android.hardware.vibrator-service.nothing
+    class hal
+    user system
+    group system input
