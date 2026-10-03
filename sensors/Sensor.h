@@ -132,6 +132,9 @@ class SingleTapSensor : public OneShotSensor {
     struct pollfd mPolls[2];
     int mWaitPipeFd[2];
     int mPollFd;
+
+    int mScreenX;
+    int mScreenY;
 };
 
 }  // namespace implementation
