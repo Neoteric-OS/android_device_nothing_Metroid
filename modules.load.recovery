@@ -233,7 +233,6 @@ nb7vpq904m.ko
 pm8941-pwrkey.ko
 qcom-hv-haptics.ko
 goodix_fp.ko
-aw_press.ko
 i2c-msm-geni.ko
 i3c-master-msm-geni.ko
 qcom-pon.ko
