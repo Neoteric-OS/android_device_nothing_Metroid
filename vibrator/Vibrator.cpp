@@ -70,7 +70,7 @@ struct RamEffect { int index; int durationMs; };
 static constexpr RamEffect kEffectMap[] = {
     /* CLICK */        {1,  20},
     /* DOUBLE_CLICK */ {2,  50},
-    /* TICK */         {3,   8},
+    /* TICK */         {1,   8},
     /* THUD */         {4,  60},
     /* POP */          {1,  20},
     /* HEAVY_CLICK */  {2,  35},
@@ -81,8 +81,8 @@ static PrimInfo getPrimInfo(CompositePrimitive p) {
     switch (p) {
         case CompositePrimitive::CLICK:      return {1, 20};
         case CompositePrimitive::THUD:       return {4, 60};
-        case CompositePrimitive::LIGHT_TICK: return {3,  8};
-        case CompositePrimitive::LOW_TICK:   return {2, 10};
+        case CompositePrimitive::LIGHT_TICK: return {1,  8};
+        case CompositePrimitive::LOW_TICK:   return {3, 10};
         default:                             return {0,  0};  // NOOP / unsupported
     }
 }
