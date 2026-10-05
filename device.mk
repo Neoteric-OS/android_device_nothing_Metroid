@@ -368,6 +368,7 @@ PRODUCT_PACKAGES += \
     ApertureRes \
     aptxalsOverlay \
     FrameworksRes \
+    FrameworksResIND \
     SettingsRes \
     SettingsProviderRes \
     SystemUIRes \
