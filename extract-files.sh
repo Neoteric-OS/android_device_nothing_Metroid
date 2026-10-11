@@ -131,6 +131,10 @@ function blob_fixup() {
             [ "$2" = "" ] && return 0
             sed -i 's/maxNonHfrFps=30/maxNonHfrFps=60/g' "${2}"
             ;;
+        vendor/bin/init.kernel.post_boot-memory.sh)
+            [ "$2" = "" ] && return 0
+            sed -i 's/#configure_zram/configure_zram/' "${2}"
+            ;;
     esac
 }
 
