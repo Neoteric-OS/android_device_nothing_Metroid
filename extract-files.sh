@@ -126,6 +126,7 @@ function blob_fixup() {
         vendor/etc/audio/sku_tuna/resourcemanager_tuna_qrd.xml)
             [ "$2" = "" ] && return 0
             sed -i 's/get_module_version="true"/get_module_version="false"/g' "${2}"
+            sed -i 's/<param concurrent_capture="false" \/>/<param concurrent_capture="true" \/>/' "${2}"
             ;;
         vendor/etc/camera/camxoverridesettings.txt)
             [ "$2" = "" ] && return 0
