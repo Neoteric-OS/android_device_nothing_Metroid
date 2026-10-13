@@ -6,9 +6,6 @@
 
 DEVICE_PATH := device/nothing/Metroid
 
-# Configure updatable_apex.mk
-$(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
-
 # Enforce generic ramdisk allow list
 $(call inherit-product, $(SRC_TARGET_DIR)/product/generic_ramdisk.mk)
 
