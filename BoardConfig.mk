@@ -44,7 +44,6 @@ SOONG_CONFIG_ufsbsg_ufsframework := bsg
 
 # Build
 BUILD_BROKEN_DUP_RULES := true
-BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
 
 # Display
 TARGET_SCREEN_DENSITY := 480

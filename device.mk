@@ -54,11 +54,20 @@ PRODUCT_PACKAGES += \
     android.hardware.audio.common-V2-ndk \
     android.hardware.audio.common-V3-ndk \
     android.hardware.audio.core.sounddose-V1-ndk.vendor \
+    android.hardware.audio.core.sounddose-V2-ndk.vendor \
+    android.hardware.audio.effect-V2-ndk.vendor \
     android.hardware.audio.effect-V3-ndk.vendor \
     android.hardware.audio.core-V2-ndk.vendor \
+    android.hardware.bluetooth.audio-V4-ndk.vendor \
+    android.hardware.common.fmq-V1-ndk.vendor \
     android.hardware.soundtrigger3-V1-ndk.vendor \
     vendor.qti.hardware.agm-V1-ndk \
-    vendor.qti.hardware.paleventnotifier-V2-ndk.vendor
+    vendor.qti.hardware.paleventnotifier-V2-ndk.vendor \
+    libalsautilsv2.vendor \
+    libmediautils_vendor.vendor \
+    libmemunreachable.vendor \
+    libnbaio_mono \
+    libtinyalsav2.vendor
 
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/configs/audio/audio_policy_volumes.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio/sku_tuna_qssi/audio_policy_volumes.xml
