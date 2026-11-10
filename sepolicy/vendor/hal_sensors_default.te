@@ -1,0 +1,2 @@
+# Allow the sensor HAL to mirror actual panel power transitions to the Goodix SSC driver.
+r_dir_file(hal_sensors_default, vendor_sysfs_panel_state)

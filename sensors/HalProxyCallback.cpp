@@ -15,7 +15,9 @@
  */
 
 #include "HalProxyCallback.h"
+#include "ProximitySensorExtension.h"
 
+#include <algorithm>
 #include <cinttypes>
 
 namespace android {
@@ -73,6 +75,16 @@ std::vector<V2_1::Event> HalProxyCallbackBase::processEvents(const std::vector<V
                     setSubHalIndex(event.u.dynamic.sensorHandle, mSubHalIndex);
         }
         const V2_1::SensorInfo& sensor = mCallback->getSensorInfo(event.sensorHandle);
+
+        if (sensor.type == V2_1::SensorType::PROXIMITY &&
+            (sensor.flags & V1_0::SensorFlagBits::WAKE_UP) != 0) {
+            constexpr float kTypicalProximityThreshold = 5.0f;
+            const float distance = event.u.scalar;
+            const float threshold = std::min(sensor.maxRange, kTypicalProximityThreshold);
+            const bool near = distance >= 0.0f && distance < threshold;
+            ::android::hardware::sensors::V2_1::implementation::notifyProximitySensorEvent(
+                    event.sensorHandle, near);
+        }
 
         if (sensor.type == V2_1::SensorType::PICK_UP_GESTURE
             && event.u.scalar != 1) {

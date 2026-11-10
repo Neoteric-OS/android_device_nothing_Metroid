@@ -5,6 +5,8 @@ genfscon sysfs /panel_feature/fp_status    u:object_r:vendor_sysfs_fingerprint:s
 # Sensors
 genfscon sysfs /devices/platform/soc/ac0000.qcom,qupv3_1_geni_se/a90000.spi/spi_master/spi4/spi4.0/fts_gesture_fod_pressed u:object_r:vendor_sysfs_sensors:s0
 genfscon sysfs /devices/platform/soc/ac0000.qcom,qupv3_1_geni_se/a90000.spi/spi_master/spi4/spi4.0/fts_gesture_single_tap_pressed u:object_r:vendor_sysfs_sensors:s0
+genfscon sysfs /devices/platform/soc/ae00000.qcom,mdss_mdp/drm/card0/sde-conn-1-DSI-1 u:object_r:vendor_sysfs_panel_state:s0
+genfscon sysfs /devices/platform/soc/ae00000.qcom,mdss_mdp/drm/card0/sde-conn-2-DSI-1 u:object_r:vendor_sysfs_panel_state:s0
 
 # Vibrator
 genfscon sysfs /devices/platform/soc/8c0000.qcom,qupv3_2_geni_se/89c000.i2c/i2c-15/15-005a/leds/vibrator_nt u:object_r:sysfs_vibrator:s0

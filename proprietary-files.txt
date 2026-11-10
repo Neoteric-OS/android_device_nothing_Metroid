@@ -2106,6 +2106,7 @@ vendor/lib64/libSensorsInterface.so
 vendor/lib64/libqsh.so
 vendor/lib64/libqsh_ble_pb.so
 vendor/lib64/libsdsprpc.so
+vendor/lib64/libsensor_extension.so
 vendor/lib64/libsensorcal.so
 vendor/lib64/libsensorndkbridge.so;DISABLE_DEPS
 vendor/lib64/libsensorslog.so

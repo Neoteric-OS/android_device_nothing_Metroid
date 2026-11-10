@@ -11,6 +11,7 @@ cc_binary {
         "service.cpp",
         "HalProxy.cpp",
         "HalProxyCallback.cpp",
+        "ProximitySensorExtension.cpp",
     ],
     header_libs: [
         "android.hardware.sensors@2.X-multihal.header",
@@ -31,6 +32,7 @@ cc_binary {
         "libutils",
         "libbinder_ndk",
         "libhidlbase",
+        "libsensor_extension",
     ],
     static_libs: [
         "libaidlcommonsupport",

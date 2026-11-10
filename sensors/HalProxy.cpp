@@ -15,6 +15,7 @@
  */
 
 #include "HalProxy.h"
+#include "ProximitySensorExtension.h"
 
 #include <android/hardware/sensors/2.0/types.h>
 
@@ -162,8 +163,30 @@ Return<Result> HalProxy::activate(int32_t sensorHandle, bool enabled) {
     if (!isSubHalIndexValid(sensorHandle)) {
         return Result::BAD_VALUE;
     }
-    return getSubHalForSensorHandle(sensorHandle)
-            ->activate(clearSubHalIndex(sensorHandle), enabled);
+
+    const auto sensor = mSensors.find(sensorHandle);
+    const bool isProximitySensor =
+            sensor != mSensors.end() && sensor->second.type == SensorType::PROXIMITY &&
+            (sensor->second.flags &
+             static_cast<uint32_t>(V1_0::SensorFlagBits::WAKE_UP)) != 0;
+
+    Return<Result> result = getSubHalForSensorHandle(sensorHandle)->activate(
+            clearSubHalIndex(sensorHandle), enabled);
+    const bool success = result.withDefault(Result::BAD_VALUE) == Result::OK;
+
+    // Apply the OEM state after QSH has created its SSC connection and before a subsequent NEAR
+    // event can blank the display. Panel-state notifications are handled by the extension worker.
+    if (isProximitySensor && success &&
+        !notifyProximitySensorActivation(sensorHandle, enabled)) {
+        ALOGE("Failed to update SSC after %s proximity sensor %d",
+              enabled ? "activating" : "deactivating", sensorHandle);
+    }
+
+    if (isProximitySensor && success) {
+        ALOGV("Proximity sensor %d is %s", sensorHandle, enabled ? "active" : "inactive");
+    }
+
+    return result;
 }
 
 Return<Result> HalProxy::initialize_2_1(

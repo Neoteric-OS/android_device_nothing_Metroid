@@ -89,6 +89,17 @@ blob_fixups: blob_fixups_user_type = {
         'vendor/lib64/libmcs.so',
     ): blob_fixup()
         .replace_needed('libaudioroute.so', 'libaudioroute-v34.so'),
+    'vendor/lib64/libsensor_extension.so': blob_fixup()
+        .binary_regex_replace(
+            (
+                b'\xe2\xff\xff\xd0\x42\x8c\x06\x91\x80\x00'
+                b'\x80\x52\xe3\x03\x13\xaa\x6e\x07\x00\x94'
+            ),
+            (
+                b'\xbf\xc2\x01\xf8\xbf\x42\x04\xf8\xbf\x42'
+                b'\x07\xf8\x1f\x20\x03\xd5\x1f\x20\x03\xd5'
+            ),
+        ),
 }  # fmt: skip
 
 module = ExtractUtilsModule(
