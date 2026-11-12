@@ -42,8 +42,8 @@ int32_t getTorchDefaultStrengthLevelExt() {
     return 50;
 }
 int32_t getTorchMaxStrengthLevelExt() {
-    // 230 (out of 500) is a sane max brightness
-    return 230;
+    // 105 (out of 500) is a sane max brightness
+    return 105;
 }
 int32_t getTorchStrengthLevelExt() {
     // We write same value in the both LEDs,
