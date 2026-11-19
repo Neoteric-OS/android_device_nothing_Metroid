@@ -1754,6 +1754,7 @@ vendor/lib64/vendor.qti.memory.pasrmanager@1.1.so
 
 # PD
 vendor/bin/pd-mapper
+vendor/lib64/libjson.so
 vendor/lib64/libpdmapper.so
 vendor/lib64/libpdnotifier.so
 
