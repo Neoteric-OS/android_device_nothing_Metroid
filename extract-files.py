@@ -89,6 +89,11 @@ blob_fixups: blob_fixups_user_type = {
         'vendor/lib64/libmcs.so',
     ): blob_fixup()
         .replace_needed('libaudioroute.so', 'libaudioroute-v34.so'),
+    'vendor/lib64/camera/components/com.qti.node.gme.so': blob_fixup()
+        .sig_replace(
+            'aa 03 1c f8 bf c3 1b b8 0b 02 80 d2 ab 03 1b f8 a0 83 5c f8 a1 c3 5b b8',
+            'aa 03 1c f8 bf c3 1b b8 0b 06 80 d2 ab 03 1b f8 a0 83 5c f8 a1 c3 5b b8',
+        ),
     'vendor/lib64/libsensor_extension.so': blob_fixup()
         .binary_regex_replace(
             (
